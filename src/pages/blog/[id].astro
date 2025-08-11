@@ -1,0 +1,141 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog');
+  return blogEntries.map(entry => ({
+    params: { id: entry.slug },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+const categoryNames = {
+  general: '一般',
+  game: 'ゲーム',
+  dev: '開発',
+  home: '家・インテリア',
+  plants: '植物',
+  travel: '旅行・グルメ'
+};
+---
+
+<Layout title={`${entry.data.title} - ブログ - TRPG研究室`}>
+  <nav class="breadcrumb">
+    <a href="/">ホーム</a> &gt; 
+    <a href="/blog">ブログ</a> &gt; 
+    <a href={`/blog/${entry.data.category}`}>{categoryNames[entry.data.category]}</a> &gt; 
+    <span class="current">{entry.data.title}</span>
+  </nav>
+
+  <article>
+    <header>
+      <h1>{entry.data.title}</h1>
+      <div class="meta">
+        <span class="category">{categoryNames[entry.data.category]}</span>
+        <span class="date">公開日: {entry.data.publishedAt.toISOString().split('T')[0]}</span>
+      </div>
+      {entry.data.tags.length > 0 && (
+        <div class="tags">
+          {entry.data.tags.map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class="content">
+      <Content />
+    </div>
+  </article>
+
+  <nav class="back-link">
+    <a href="/blog">← ブログ一覧に戻る</a>
+  </nav>
+
+  <style>
+    .breadcrumb {
+      margin-bottom: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .breadcrumb a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .breadcrumb .current {
+      font-weight: bold;
+    }
+    article header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    article h1 {
+      margin: 0 0 1rem 0;
+      color: #2c3e50;
+    }
+    .meta {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .meta .category {
+      background-color: #3498db;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+    .meta .date {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .tags {
+      margin-top: 1rem;
+    }
+    .tag {
+      display: inline-block;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-right: 0.5rem;
+    }
+    .content {
+      line-height: 1.8;
+    }
+    .content h1, .content h2, .content h3 {
+      color: #2c3e50;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    .content p {
+      margin-bottom: 1rem;
+    }
+    .content ul, .content ol {
+      margin-bottom: 1rem;
+      padding-left: 2rem;
+    }
+    .back-link {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+    .back-link a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</Layout>

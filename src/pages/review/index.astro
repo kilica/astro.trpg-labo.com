@@ -1,0 +1,183 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const url = new URL(Astro.request.url);
+const currentPage = parseInt(url.searchParams.get('page') || '1');
+const itemsPerPage = 20;
+
+const reviewEntries = await getCollection('review');
+const sortedEntries = reviewEntries.sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+
+const totalPages = Math.ceil(sortedEntries.length / itemsPerPage);
+const startIndex = (currentPage - 1) * itemsPerPage;
+const endIndex = startIndex + itemsPerPage;
+const currentEntries = sortedEntries.slice(startIndex, endIndex);
+
+const categoryNames = {
+  gadget: 'ガジェット',
+  book: '本'
+};
+
+function renderStars(rating) {
+  return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+}
+---
+
+<Layout title="レビュー - TRPG研究室">
+  <h1>レビュー</h1>
+  <p>ガジェットや本のレビューを5段階評価で紹介しています。</p>
+
+  <div class="categories">
+    <h3>カテゴリで絞り込み</h3>
+    <ul>
+      <li><a href="/review">すべて</a></li>
+      <li><a href="/review/gadget">ガジェット</a></li>
+      <li><a href="/review/book">本</a></li>
+    </ul>
+  </div>
+
+  <div class="review-list">
+    {currentEntries.map(entry => (
+      <article class="review-item">
+        <h2>
+          <a href={`/review/${entry.slug}`}>{entry.data.title}</a>
+        </h2>
+        <div class="meta">
+          <span class="category">{categoryNames[entry.data.category]}</span>
+          <span class="rating">{renderStars(entry.data.rating)} ({entry.data.rating}/5)</span>
+          <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+        </div>
+        {entry.data.recommendFor && (
+          <div class="recommend-section">
+            <h4>おすすめする人</h4>
+            <p>{entry.data.recommendFor}</p>
+          </div>
+        )}
+        {entry.data.notRecommendFor && (
+          <div class="not-recommend-section">
+            <h4>おすすめしない人</h4>
+            <p>{entry.data.notRecommendFor}</p>
+          </div>
+        )}
+      </article>
+    ))}
+  </div>
+
+  {currentEntries.length === 0 && (
+    <div class="no-reviews">
+      <p>レビューがまだありません。</p>
+    </div>
+  )}
+
+  {totalPages > 1 && (
+    <div class="pagination">
+      {currentPage > 1 && (
+        <a href={`/review?page=${currentPage - 1}`}>← 前のページ</a>
+      )}
+      
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        page === currentPage ? (
+          <span class="current">{page}</span>
+        ) : (
+          <a href={`/review?page=${page}`}>{page}</a>
+        )
+      ))}
+      
+      {currentPage < totalPages && (
+        <a href={`/review?page=${currentPage + 1}`}>次のページ →</a>
+      )}
+    </div>
+  )}
+
+  <style>
+    .categories {
+      margin: 2rem 0;
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+    }
+    .categories h3 {
+      margin: 0 0 1rem 0;
+      color: #2c3e50;
+    }
+    .categories ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .categories a {
+      color: #3498db;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid #3498db;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    .categories a:hover {
+      background-color: #3498db;
+      color: white;
+    }
+    .review-list {
+      margin: 2rem 0;
+    }
+    .review-item {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #e74c3c;
+    }
+    .review-item h2 {
+      margin: 0 0 1rem 0;
+    }
+    .review-item h2 a {
+      color: #2c3e50;
+      text-decoration: none;
+    }
+    .review-item h2 a:hover {
+      color: #e74c3c;
+    }
+    .meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .meta .rating {
+      color: #f39c12;
+      font-weight: bold;
+    }
+    .recommend-section, .not-recommend-section {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 6px;
+    }
+    .recommend-section {
+      background-color: #d5f4e6;
+      border-left: 4px solid #27ae60;
+    }
+    .not-recommend-section {
+      background-color: #fadbd8;
+      border-left: 4px solid #e74c3c;
+    }
+    .recommend-section h4, .not-recommend-section h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+    .recommend-section p, .not-recommend-section p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    .no-reviews {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+  </style>
+</Layout>
