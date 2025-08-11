@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { marked } from 'marked';
 
 export async function getStaticPaths() {
   const reviewEntries = await getCollection('review');
@@ -21,6 +22,12 @@ const categoryNames = {
 function renderStars(rating) {
   return '★'.repeat(rating) + '☆'.repeat(5 - rating);
 }
+
+// Process markdown fields
+const processedRecommendFor = entry.data.recommendFor ? marked(entry.data.recommendFor) : null;
+const processedNotRecommendFor = entry.data.notRecommendFor ? marked(entry.data.notRecommendFor) : null;
+const processedGoodPoints = entry.data.goodPoints ? marked(entry.data.goodPoints) : null;
+const processedBadPoints = entry.data.badPoints ? marked(entry.data.badPoints) : null;
 ---
 
 <Layout title={`${entry.data.title} - レビュー - TRPG研究室`}>
@@ -55,31 +62,31 @@ function renderStars(rating) {
     </header>
 
     <div class="review-sections">
-      {entry.data.recommendFor && (
+      {processedRecommendFor && (
         <section class="recommend-section">
           <h3>おすすめする人</h3>
-          <div set:html={entry.data.recommendFor} />
+          <div set:html={processedRecommendFor} />
         </section>
       )}
 
-      {entry.data.notRecommendFor && (
+      {processedNotRecommendFor && (
         <section class="not-recommend-section">
           <h3>おすすめしない人</h3>
-          <div set:html={entry.data.notRecommendFor} />
+          <div set:html={processedNotRecommendFor} />
         </section>
       )}
 
-      {entry.data.goodPoints && (
+      {processedGoodPoints && (
         <section class="good-points-section">
           <h3>良かった点</h3>
-          <div set:html={entry.data.goodPoints} />
+          <div set:html={processedGoodPoints} />
         </section>
       )}
 
-      {entry.data.badPoints && (
+      {processedBadPoints && (
         <section class="bad-points-section">
           <h3>悪かった点</h3>
-          <div set:html={entry.data.badPoints} />
+          <div set:html={processedBadPoints} />
         </section>
       )}
     </div>
