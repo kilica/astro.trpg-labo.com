@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { marked } from 'marked';
 
 export async function getStaticPaths() {
   const categories = ['gadget', 'book'];
@@ -70,13 +71,13 @@ function renderStars(rating) {
         {entry.data.recommendFor && (
           <div class="recommend-section">
             <h4>おすすめする人</h4>
-            <p>{entry.data.recommendFor}</p>
+            <div set:html={marked(entry.data.recommendFor)} />
           </div>
         )}
         {entry.data.notRecommendFor && (
           <div class="not-recommend-section">
             <h4>おすすめしない人</h4>
-            <p>{entry.data.notRecommendFor}</p>
+            <div set:html={marked(entry.data.notRecommendFor)} />
           </div>
         )}
       </article>
