@@ -1,0 +1,208 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const categories = ['general', 'game', 'dev', 'home', 'plants', 'travel'];
+  return categories.map(category => ({
+    params: { category_slug: category }
+  }));
+}
+
+const { category_slug } = Astro.params;
+
+const url = new URL(Astro.request.url);
+const currentPage = parseInt(url.searchParams.get('page') || '1');
+const itemsPerPage = 20;
+
+const blogEntries = await getCollection('blog');
+const filteredEntries = blogEntries
+  .filter(entry => entry.data.category === category_slug)
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+
+const totalPages = Math.ceil(filteredEntries.length / itemsPerPage);
+const startIndex = (currentPage - 1) * itemsPerPage;
+const endIndex = startIndex + itemsPerPage;
+const currentEntries = filteredEntries.slice(startIndex, endIndex);
+
+const categoryNames = {
+  general: '一般',
+  game: 'ゲーム',
+  dev: '開発',
+  home: '家・インテリア',
+  plants: '植物',
+  travel: '旅行・グルメ'
+};
+
+const currentCategoryName = categoryNames[category_slug];
+---
+
+<Layout title={`${currentCategoryName} - ブログ - TRPG研究室`}>
+  <nav class="breadcrumb">
+    <a href="/">ホーム</a> &gt; 
+    <a href="/blog">ブログ</a> &gt; 
+    <span class="current">{currentCategoryName}</span>
+  </nav>
+
+  <h1>ブログ - {currentCategoryName}</h1>
+  <p>{currentCategoryName}カテゴリの記事一覧です。</p>
+
+  <div class="categories">
+    <h3>カテゴリで絞り込み</h3>
+    <ul>
+      <li><a href="/blog">すべて</a></li>
+      <li><a href="/blog/general" class={category_slug === 'general' ? 'active' : ''}>一般</a></li>
+      <li><a href="/blog/game" class={category_slug === 'game' ? 'active' : ''}>ゲーム</a></li>
+      <li><a href="/blog/dev" class={category_slug === 'dev' ? 'active' : ''}>開発</a></li>
+      <li><a href="/blog/home" class={category_slug === 'home' ? 'active' : ''}>家・インテリア</a></li>
+      <li><a href="/blog/plants" class={category_slug === 'plants' ? 'active' : ''}>植物</a></li>
+      <li><a href="/blog/travel" class={category_slug === 'travel' ? 'active' : ''}>旅行・グルメ</a></li>
+    </ul>
+  </div>
+
+  <div class="blog-list">
+    {currentEntries.map(entry => (
+      <article class="blog-item">
+        <h2>
+          <a href={`/blog/${entry.slug}`}>{entry.data.title}</a>
+        </h2>
+        <div class="meta">
+          <span class="category">{categoryNames[entry.data.category]}</span>
+          <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+        </div>
+        <div class="excerpt">
+          {entry.body.slice(0, 500)}...
+        </div>
+        {entry.data.tags.length > 0 && (
+          <div class="tags">
+            {entry.data.tags.map(tag => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )}
+      </article>
+    ))}
+  </div>
+
+  {currentEntries.length === 0 && (
+    <div class="no-posts">
+      <p>このカテゴリにはまだ記事がありません。</p>
+    </div>
+  )}
+
+  {totalPages > 1 && (
+    <div class="pagination">
+      {currentPage > 1 && (
+        <a href={`/blog/${category_slug}?page=${currentPage - 1}`}>← 前のページ</a>
+      )}
+      
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        page === currentPage ? (
+          <span class="current">{page}</span>
+        ) : (
+          <a href={`/blog/${category_slug}?page=${page}`}>{page}</a>
+        )
+      ))}
+      
+      {currentPage < totalPages && (
+        <a href={`/blog/${category_slug}?page=${currentPage + 1}`}>次のページ →</a>
+      )}
+    </div>
+  )}
+
+  <style>
+    .breadcrumb {
+      margin-bottom: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .breadcrumb a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .breadcrumb .current {
+      font-weight: bold;
+    }
+    .categories {
+      margin: 2rem 0;
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+    }
+    .categories h3 {
+      margin: 0 0 1rem 0;
+      color: #2c3e50;
+    }
+    .categories ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .categories a {
+      color: #3498db;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid #3498db;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    .categories a:hover, .categories a.active {
+      background-color: #3498db;
+      color: white;
+    }
+    .blog-list {
+      margin: 2rem 0;
+    }
+    .blog-item {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    }
+    .blog-item h2 {
+      margin: 0 0 1rem 0;
+    }
+    .blog-item h2 a {
+      color: #2c3e50;
+      text-decoration: none;
+    }
+    .blog-item h2 a:hover {
+      color: #3498db;
+    }
+    .meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+    .excerpt {
+      margin: 1rem 0;
+      line-height: 1.6;
+      color: #555;
+    }
+    .tags {
+      margin-top: 1rem;
+    }
+    .tag {
+      display: inline-block;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-right: 0.5rem;
+    }
+    .no-posts {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+  </style>
+</Layout>

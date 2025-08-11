@@ -1,0 +1,129 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const laboEntries = await getCollection('labo');
+  return laboEntries.map(entry => ({
+    params: { id: entry.slug },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+const categoryNames = {
+  general: '全般',
+  scenariomaking: 'シナリオ作成',
+  system: 'システム'
+};
+
+// Get parent entry if exists
+let parentEntry = null;
+if (entry.data.parent) {
+  parentEntry = await getEntry('labo', entry.data.parent);
+}
+---
+
+<Layout title={`${entry.data.title} - 研究室 - TRPG研究室`}>
+  <nav class="breadcrumb">
+    <a href="/">ホーム</a> &gt; 
+    <a href="/labo">研究室</a> &gt; 
+    <span class="category">{categoryNames[entry.data.category]}</span>
+    {parentEntry && (
+      <>
+        &gt; <a href={`/labo/${parentEntry.slug}`}>{parentEntry.data.title}</a>
+      </>
+    )}
+    &gt; <span class="current">{entry.data.title}</span>
+  </nav>
+
+  <article>
+    <header>
+      <h1>{entry.data.title}</h1>
+      <div class="meta">
+        <span class="category">{categoryNames[entry.data.category]}</span>
+        <span class="date">公開日: {entry.data.publishedAt.toISOString().split('T')[0]}</span>
+      </div>
+    </header>
+
+    <div class="content">
+      <Content />
+    </div>
+  </article>
+
+  <nav class="back-link">
+    <a href="/labo">← 研究室一覧に戻る</a>
+  </nav>
+
+  <style>
+    .breadcrumb {
+      margin-bottom: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .breadcrumb a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .breadcrumb .current {
+      font-weight: bold;
+    }
+    article header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    article h1 {
+      margin: 0 0 1rem 0;
+      color: #2c3e50;
+    }
+    .meta {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .meta .category {
+      background-color: #3498db;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+    .meta .date {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .content {
+      line-height: 1.8;
+    }
+    .content h1, .content h2, .content h3 {
+      color: #2c3e50;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    .content p {
+      margin-bottom: 1rem;
+    }
+    .content ul, .content ol {
+      margin-bottom: 1rem;
+      padding-left: 2rem;
+    }
+    .back-link {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+    .back-link a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</Layout>
