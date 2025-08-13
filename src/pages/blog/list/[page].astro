@@ -1,0 +1,81 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export const prerender = true;
+
+export async function getStaticPaths({ paginate }) {
+  const blogEntries = await getCollection('blog');
+  const sortedEntries = blogEntries.sort(
+    (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+  );
+
+  return paginate(sortedEntries, { pageSize: 20 });
+}
+
+const { page } = Astro.props;
+const categoryNames = {
+  general: '一般',
+  game: 'ゲーム',
+  dev: '開発',
+  home: '家・インテリア',
+  plants: '植物',
+  travel: '旅行・グルメ'
+};
+---
+
+<Layout title={`ブログ - ページ ${page.currentPage}`}>
+  <h1>ブログ</h1>
+  <p>TRPGや日常に関する記事を投稿しています。</p>
+
+  <div class="categories">
+    <h3>カテゴリで絞り込み</h3>
+    <ul>
+      <li><a href="/blog/list/1">すべて</a></li>
+      <li><a href="/blog/general">一般</a></li>
+      <li><a href="/blog/game">ゲーム</a></li>
+      <li><a href="/blog/dev">開発</a></li>
+      <li><a href="/blog/home">家・インテリア</a></li>
+      <li><a href="/blog/plants">植物</a></li>
+      <li><a href="/blog/travel">旅行・グルメ</a></li>
+    </ul>
+  </div>
+
+  <div class="blog-list">
+    {page.data.map(entry => (
+      <article class="blog-item">
+        <h2>
+          <a href={`/blog/${entry.slug}`}>{entry.data.title}</a>
+        </h2>
+        <div class="meta">
+          <span class="category">{categoryNames[entry.data.category]}</span>
+          <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+        </div>
+        <div class="excerpt">
+          {entry.body.slice(0, 500)}...
+        </div>
+        {entry.data.tags?.length > 0 && (
+          <div class="tags">
+            {entry.data.tags.map(tag => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )}
+      </article>
+    ))}
+  </div>
+
+  {page.lastPage > 1 && (
+    <div class="pagination">
+      {page.url.prev && <a href={page.url.prev}>← 前のページ</a>}
+      {Array.from({ length: page.lastPage }, (_, i) => i + 1).map(p =>
+        p === page.currentPage ? (
+          <span class="current">{p}</span>
+        ) : (
+          <a href={`/blog/list/${p}`}>{p}</a>
+        )
+      )}
+      {page.url.next && <a href={page.url.next}>次のページ →</a>}
+    </div>
+  )}
+</Layout>
