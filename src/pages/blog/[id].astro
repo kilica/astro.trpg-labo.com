@@ -13,6 +13,16 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 
+// Get all blog entries for sidebar
+const allBlogEntries = await getCollection('blog');
+const sortedEntries = allBlogEntries.sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+
+// Recent 10 articles
+const recentArticles = sortedEntries.slice(0, 10);
+
+// Get unique years from publishedAt
+const years = [...new Set(allBlogEntries.map(entry => entry.data.publishedAt.getFullYear()))].sort((a, b) => b - a);
+
 const categoryNames = {
   general: '一般',
   game: 'ゲーム',
@@ -31,30 +41,77 @@ const categoryNames = {
     <span class="current">{entry.data.title}</span>
   </nav>
 
-  <article>
-    <header>
-      <h1>{entry.data.title}</h1>
-      <div class="meta">
-        <span class="category">{categoryNames[entry.data.category]}</span>
-        <span class="date">公開日: {entry.data.publishedAt.toISOString().split('T')[0]}</span>
-      </div>
-      {entry.data.tags.length > 0 && (
-        <div class="tags">
-          {entry.data.tags.map(tag => (
-            <span class="tag">{tag}</span>
+  <div class="layout-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <!-- Recent Articles -->
+      <section class="sidebar-section">
+        <h3>最近の記事</h3>
+        <ul class="recent-articles">
+          {recentArticles.map(article => (
+            <li>
+              <a href={`/blog/${article.slug}`}>
+                <span class="article-date">{article.data.publishedAt.toISOString().split('T')[0]}</span>
+                <span class="article-title">{article.data.title}</span>
+              </a>
+            </li>
           ))}
+        </ul>
+      </section>
+
+      <!-- Categories -->
+      <section class="sidebar-section">
+        <h3>カテゴリ一覧</h3>
+        <ul class="category-list">
+          {Object.entries(categoryNames).map(([slug, name]) => (
+            <li>
+              <a href={`/blog/${slug}`}>{name}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- Year Archive -->
+      <section class="sidebar-section">
+        <h3>年別アーカイブ</h3>
+        <ul class="year-list">
+          {years.map(year => (
+            <li>
+              <a href={`/blog?year=${year}`}>{year}年</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <article>
+        <header>
+          <h1>{entry.data.title}</h1>
+          <div class="meta">
+            <span class="category">{categoryNames[entry.data.category]}</span>
+            <span class="date">公開日: {entry.data.publishedAt.toISOString().split('T')[0]}</span>
+          </div>
+          {entry.data.tags.length > 0 && (
+            <div class="tags">
+              {entry.data.tags.map(tag => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+        </header>
+
+        <div class="content">
+          <Content />
         </div>
-      )}
-    </header>
+      </article>
 
-    <div class="content">
-      <Content />
-    </div>
-  </article>
-
-  <nav class="back-link">
-    <a href="/blog">← ブログ一覧に戻る</a>
-  </nav>
+      <nav class="back-link">
+        <a href="/blog">← ブログ一覧に戻る</a>
+      </nav>
+    </main>
+  </div></Layout>
 
   <style>
     .breadcrumb {
@@ -72,6 +129,117 @@ const categoryNames = {
     .breadcrumb .current {
       font-weight: bold;
     }
+
+    .layout-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .layout-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .sidebar {
+        order: 2;
+      }
+      .main-content {
+        order: 1;
+      }
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      background-color: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      height: fit-content;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .sidebar-section {
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .sidebar h3 {
+      color: #2c3e50;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #3498db;
+    }
+
+    .recent-articles, .category-list, .year-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .recent-articles li {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .recent-articles li:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .recent-articles a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .recent-articles a:hover {
+      color: #3498db;
+    }
+
+    .article-date {
+      display: block;
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    .article-title {
+      display: block;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .category-list li, .year-list li {
+      margin-bottom: 0.5rem;
+    }
+
+    .category-list a, .year-list a {
+      color: #2c3e50;
+      text-decoration: none;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      display: block;
+      transition: background-color 0.2s;
+    }
+
+    .category-list a:hover, .year-list a:hover {
+      background-color: #e9ecef;
+      color: #3498db;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      min-width: 0;
+    }
+
     article header {
       margin-bottom: 2rem;
       padding-bottom: 1rem;
