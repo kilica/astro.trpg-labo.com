@@ -14,6 +14,10 @@ const startIndex = (currentPage - 1) * itemsPerPage;
 const endIndex = startIndex + itemsPerPage;
 const currentEntries = sortedEntries.slice(startIndex, endIndex);
 
+// Sidebar data
+const recentArticles = sortedEntries.slice(0, 10);
+const years = [...new Set(blogEntries.map(entry => entry.data.publishedAt.getFullYear()))].sort((a, b) => b - a);
+
 const categoryNames = {
   general: '一般',
   game: 'ゲーム',
@@ -25,67 +29,224 @@ const categoryNames = {
 ---
 
 <Layout title="ブログ - TRPG研究室">
-  <h1>ブログ</h1>
-  <p>TRPGや日常に関する記事を投稿しています。</p>
+  <div class="layout-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <!-- Recent Articles -->
+      <section class="sidebar-section">
+        <h3>最近の記事</h3>
+        <ul class="recent-articles">
+          {recentArticles.map(article => (
+            <li>
+              <a href={`/blog/${article.slug}`}>
+                <span class="article-date">{article.data.publishedAt.toISOString().split('T')[0]}</span>
+                <span class="article-title">{article.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-  <div class="categories">
-    <h3>カテゴリで絞り込み</h3>
-    <ul>
-      <li><a href="/blog">すべて</a></li>
-      <li><a href="/blog/general">一般</a></li>
-      <li><a href="/blog/game">ゲーム</a></li>
-      <li><a href="/blog/dev">開発</a></li>
-      <li><a href="/blog/home">家・インテリア</a></li>
-      <li><a href="/blog/plants">植物</a></li>
-      <li><a href="/blog/travel">旅行・グルメ</a></li>
-    </ul>
-  </div>
+      <!-- Categories -->
+      <section class="sidebar-section">
+        <h3>カテゴリ一覧</h3>
+        <ul class="category-list">
+          {Object.entries(categoryNames).map(([slug, name]) => (
+            <li>
+              <a href={`/blog/${slug}`}>{name}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-  <div class="blog-list">
-    {currentEntries.map(entry => (
-      <article class="blog-item">
-        <h2>
-          <a href={`/blog/${entry.slug}`}>{entry.data.title}</a>
-        </h2>
-        <div class="meta">
-          <span class="category">{categoryNames[entry.data.category]}</span>
-          <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+      <!-- Year Archive -->
+      <section class="sidebar-section">
+        <h3>年別アーカイブ</h3>
+        <ul class="year-list">
+          {years.map(year => (
+            <li>
+              <a href={`/blog?year=${year}`}>{year}年</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h1>ブログ</h1>
+      <p>TRPGや日常に関する記事を投稿しています。</p>
+
+      <div class="categories">
+        <h3>カテゴリで絞り込み</h3>
+        <ul>
+          <li><a href="/blog">すべて</a></li>
+          <li><a href="/blog/general">一般</a></li>
+          <li><a href="/blog/game">ゲーム</a></li>
+          <li><a href="/blog/dev">開発</a></li>
+          <li><a href="/blog/home">家・インテリア</a></li>
+          <li><a href="/blog/plants">植物</a></li>
+          <li><a href="/blog/travel">旅行・グルメ</a></li>
+        </ul>
+      </div>
+
+      <div class="blog-list">
+        {currentEntries.map(entry => (
+          <article class="blog-item">
+            <h2>
+              <a href={`/blog/${entry.slug}`}>{entry.data.title}</a>
+            </h2>
+            <div class="meta">
+              <span class="category">{categoryNames[entry.data.category]}</span>
+              <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+            </div>
+            <div class="excerpt">
+              {entry.body.slice(0, 500)}...
+            </div>
+            {entry.data.tags.length > 0 && (
+              <div class="tags">
+                {entry.data.tags.map(tag => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div class="pagination">
+          {currentPage > 1 && (
+            <a href={`/blog?page=${currentPage - 1}`}>← 前のページ</a>
+          )}
+          
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            page === currentPage ? (
+              <span class="current">{page}</span>
+            ) : (
+              <a href={`/blog?page=${page}`}>{page}</a>
+            )
+          ))}
+          
+          {currentPage < totalPages && (
+            <a href={`/blog?page=${currentPage + 1}`}>次のページ →</a>
+          )}
         </div>
-        <div class="excerpt">
-          {entry.body.slice(0, 500)}...
-        </div>
-        {entry.data.tags.length > 0 && (
-          <div class="tags">
-            {entry.data.tags.map(tag => (
-              <span class="tag">{tag}</span>
-            ))}
-          </div>
-        )}
-      </article>
-    ))}
-  </div>
-
-  {totalPages > 1 && (
-    <div class="pagination">
-      {currentPage > 1 && (
-        <a href={`/blog?page=${currentPage - 1}`}>← 前のページ</a>
       )}
-      
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-        page === currentPage ? (
-          <span class="current">{page}</span>
-        ) : (
-          <a href={`/blog?page=${page}`}>{page}</a>
-        )
-      ))}
-      
-      {currentPage < totalPages && (
-        <a href={`/blog?page=${currentPage + 1}`}>次のページ →</a>
-      )}
-    </div>
-  )}
+    </main>
+  </div></Layout>
 
   <style>
+    .layout-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .layout-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .sidebar {
+        order: 2;
+      }
+      .main-content {
+        order: 1;
+      }
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      background-color: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      height: fit-content;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .sidebar-section {
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .sidebar h3 {
+      color: #2c3e50;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #3498db;
+    }
+
+    .recent-articles, .category-list, .year-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .recent-articles li {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .recent-articles li:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .recent-articles a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .recent-articles a:hover {
+      color: #3498db;
+    }
+
+    .article-date {
+      display: block;
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    .article-title {
+      display: block;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .category-list li, .year-list li {
+      margin-bottom: 0.5rem;
+    }
+
+    .category-list a, .year-list a {
+      color: #2c3e50;
+      text-decoration: none;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      display: block;
+      transition: background-color 0.2s;
+    }
+
+    .category-list a:hover, .year-list a:hover {
+      background-color: #e9ecef;
+      color: #3498db;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      min-width: 0;
+    }
+
     .categories {
       margin: 2rem 0;
       padding: 1rem;
