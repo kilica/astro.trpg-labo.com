@@ -13,11 +13,56 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 
+// Get all labo entries for sidebar
+const allLaboEntries = await getCollection('labo');
+
+// Group by category
+const categories = {
+  general: allLaboEntries.filter(entry => entry.data.category === 'general'),
+  scenariomaking: allLaboEntries.filter(entry => entry.data.category === 'scenariomaking'),
+  system: allLaboEntries.filter(entry => entry.data.category === 'system')
+};
+
 const categoryNames = {
   general: '全般',
   scenariomaking: 'シナリオ作成',
   system: 'システム'
 };
+
+// Function to build hierarchy
+function buildHierarchy(entries) {
+  const entryMap = new Map();
+  const roots = [];
+  
+  // Create map of all entries
+  entries.forEach(entry => {
+    entryMap.set(entry.slug, { ...entry, children: [] });
+  });
+  
+  // Build hierarchy
+  entries.forEach(entry => {
+    const item = entryMap.get(entry.slug);
+    if (entry.data.parent) {
+      const parent = entryMap.get(entry.data.parent);
+      if (parent) {
+        parent.children.push(item);
+      } else {
+        roots.push(item);
+      }
+    } else {
+      roots.push(item);
+    }
+  });
+  
+  // Sort by order
+  function sortByOrder(items) {
+    items.sort((a, b) => a.data.order - b.data.order);
+    items.forEach(item => sortByOrder(item.children));
+  }
+  
+  sortByOrder(roots);
+  return roots;
+}
 
 // Get parent entry if exists
 let parentEntry = null;
@@ -39,23 +84,62 @@ if (entry.data.parent) {
     &gt; <span class="current">{entry.data.title}</span>
   </nav>
 
-  <article>
-    <header>
-      <h1>{entry.data.title}</h1>
-      <div class="meta">
-        <span class="category">{categoryNames[entry.data.category]}</span>
-        <span class="date">公開日: {entry.data.publishedAt.toISOString().split('T')[0]}</span>
-      </div>
-    </header>
+  <div class="layout-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <section class="sidebar-section">
+        <h3>記事一覧</h3>
+        {Object.entries(categories).map(([categoryKey, entries]) => (
+          entries.length > 0 && (
+            <div class="category-group">
+              <h4 class="category-title">{categoryNames[categoryKey]}</h4>
+              <div class="hierarchy">
+                {buildHierarchy(entries).map(entry => (
+                  <div class="entry-item">
+                    <a href={`/labo/${entry.slug}`} class="entry-link">
+                      {entry.data.title}
+                    </a>
+                    {entry.children.length > 0 && (
+                      <div class="children">
+                        {entry.children.map(child => (
+                          <div class="child-item">
+                            <a href={`/labo/${child.slug}`} class="child-link">
+                              {child.data.title}
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        ))}
+      </section>
+    </aside>
 
-    <div class="content">
-      <Content />
-    </div>
-  </article>
+    <!-- Main Content -->
+    <main class="main-content">
+      <article>
+        <header>
+          <h1>{entry.data.title}</h1>
+          <div class="meta">
+            <span class="category">{categoryNames[entry.data.category]}</span>
+            <span class="date">公開日: {entry.data.publishedAt.toISOString().split('T')[0]}</span>
+          </div>
+        </header>
 
-  <nav class="back-link">
-    <a href="/labo">← 研究室一覧に戻る</a>
-  </nav>
+        <div class="content">
+          <Content />
+        </div>
+      </article>
+
+      <nav class="back-link">
+        <a href="/labo">← 研究室一覧に戻る</a>
+      </nav>
+    </main>
+  </div></Layout>
 
   <style>
     .breadcrumb {
@@ -73,6 +157,116 @@ if (entry.data.parent) {
     .breadcrumb .current {
       font-weight: bold;
     }
+
+    .layout-container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .layout-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .sidebar {
+        order: 2;
+      }
+      .main-content {
+        order: 1;
+      }
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      background-color: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      height: fit-content;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .sidebar-section h3 {
+      color: #2c3e50;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #3498db;
+    }
+
+    .category-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .category-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .category-title {
+      color: #2c3e50;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .hierarchy {
+      margin-left: 0.5rem;
+    }
+
+    .entry-item {
+      margin-bottom: 0.75rem;
+    }
+
+    .entry-link {
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: 500;
+      display: block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .entry-link:hover {
+      background-color: #e9ecef;
+      color: #3498db;
+    }
+
+    .children {
+      margin-top: 0.5rem;
+      margin-left: 1rem;
+      padding-left: 0.75rem;
+      border-left: 2px solid #dee2e6;
+    }
+
+    .child-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .child-link {
+      color: #495057;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .child-link:hover {
+      background-color: #e9ecef;
+      color: #3498db;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      min-width: 0;
+    }
+
     article header {
       margin-bottom: 2rem;
       padding-bottom: 1rem;
