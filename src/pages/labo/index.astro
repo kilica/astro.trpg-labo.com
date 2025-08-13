@@ -54,31 +54,39 @@ function buildHierarchy(entries) {
 ---
 
 <Layout title="研究室 - TRPG研究室">
-  <h1>研究室</h1>
-  <p>TRPGに関する研究や情報をカテゴリ別にまとめています。</p>
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-90 mb-4">研究室</h1>
+    <p class="text-75">TRPGに関する研究や情報をカテゴリ別にまとめています。</p>
+  </div>
 
   {Object.entries(categories).map(([categoryKey, entries]) => (
     entries.length > 0 && (
-      <section class="category-section">
-        <h2>{categoryNames[categoryKey]}</h2>
-        <div class="hierarchy">
+      <section class="mb-10">
+        <h2 class="text-2xl font-bold text-90 mb-6 pb-2 border-b border-[var(--line-divider)]">
+          {categoryNames[categoryKey]}
+        </h2>
+        <div class="space-y-4">
           {buildHierarchy(entries).map(entry => (
-            <div class="entry-item">
-              <h3>
-                <a href={`/labo/${entry.slug}`}>{entry.data.title}</a>
+            <div class="card border-l-4 border-[var(--primary)]">
+              <h3 class="text-lg font-semibold mb-2">
+                <a href={`/labo/${entry.slug}`} class="link-underline text-90 hover:text-[var(--primary)]">
+                  {entry.data.title}
+                </a>
               </h3>
-              <div class="meta">
-                <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+              <div class="meta mb-3">
+                <span class="text-50">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
               </div>
               {entry.children.length > 0 && (
-                <div class="children">
+                <div class="ml-6 pl-4 border-l-2 border-[var(--line-divider)] space-y-3">
                   {entry.children.map(child => (
-                    <div class="child-item">
-                      <h4>
-                        <a href={`/labo/${child.slug}`}>{child.data.title}</a>
+                    <div class="card !p-3 bg-[var(--btn-regular-bg)]">
+                      <h4 class="text-base font-medium mb-1">
+                        <a href={`/labo/${child.slug}`} class="link-underline text-90 hover:text-[var(--primary)]">
+                          {child.data.title}
+                        </a>
                       </h4>
                       <div class="meta">
-                        <span class="date">{child.data.publishedAt.toISOString().split('T')[0]}</span>
+                        <span class="text-50 text-sm">{child.data.publishedAt.toISOString().split('T')[0]}</span>
                       </div>
                     </div>
                   ))}
@@ -90,62 +98,4 @@ function buildHierarchy(entries) {
       </section>
     )
   ))}
-
-  <style>
-    .category-section {
-      margin: 2rem 0;
-      padding: 1.5rem;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-    }
-    .category-section h2 {
-      color: #2c3e50;
-      border-bottom: 2px solid #3498db;
-      padding-bottom: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .entry-item {
-      margin: 1rem 0;
-      padding: 1rem;
-      background-color: white;
-      border-radius: 6px;
-      border-left: 4px solid #3498db;
-    }
-    .entry-item h3 {
-      margin: 0 0 0.5rem 0;
-    }
-    .entry-item h3 a {
-      color: #2c3e50;
-      text-decoration: none;
-    }
-    .entry-item h3 a:hover {
-      color: #3498db;
-    }
-    .children {
-      margin-top: 1rem;
-      padding-left: 2rem;
-      border-left: 2px solid #ecf0f1;
-    }
-    .child-item {
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      background-color: #f8f9fa;
-      border-radius: 4px;
-    }
-    .child-item h4 {
-      margin: 0 0 0.25rem 0;
-      font-size: 1rem;
-    }
-    .child-item h4 a {
-      color: #34495e;
-      text-decoration: none;
-    }
-    .child-item h4 a:hover {
-      color: #3498db;
-    }
-    .meta {
-      color: #666;
-      font-size: 0.9rem;
-    }
-  </style>
 </Layout>
