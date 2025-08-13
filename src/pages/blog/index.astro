@@ -25,45 +25,39 @@ const categoryNames = {
 ---
 
 <Layout title="ブログ - TRPG研究室">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-90 mb-4">ブログ</h1>
-    <p class="text-75">TRPGや日常に関する記事を投稿しています。</p>
+  <h1>ブログ</h1>
+  <p>TRPGや日常に関する記事を投稿しています。</p>
+
+  <div class="categories">
+    <h3>カテゴリで絞り込み</h3>
+    <ul>
+      <li><a href="/blog">すべて</a></li>
+      <li><a href="/blog/general">一般</a></li>
+      <li><a href="/blog/game">ゲーム</a></li>
+      <li><a href="/blog/dev">開発</a></li>
+      <li><a href="/blog/home">家・インテリア</a></li>
+      <li><a href="/blog/plants">植物</a></li>
+      <li><a href="/blog/travel">旅行・グルメ</a></li>
+    </ul>
   </div>
 
-  <div class="card mb-8">
-    <h3 class="text-lg font-semibold text-90 mb-4">カテゴリで絞り込み</h3>
-    <div class="flex flex-wrap gap-3">
-      <a href="/blog" class="btn-regular px-3 py-1 rounded text-sm">すべて</a>
-      <a href="/blog/general" class="btn-plain px-3 py-1 rounded text-sm hover:bg-[var(--btn-plain-bg-hover)]">一般</a>
-      <a href="/blog/game" class="btn-plain px-3 py-1 rounded text-sm hover:bg-[var(--btn-plain-bg-hover)]">ゲーム</a>
-      <a href="/blog/dev" class="btn-plain px-3 py-1 rounded text-sm hover:bg-[var(--btn-plain-bg-hover)]">開発</a>
-      <a href="/blog/home" class="btn-plain px-3 py-1 rounded text-sm hover:bg-[var(--btn-plain-bg-hover)]">家・インテリア</a>
-      <a href="/blog/plants" class="btn-plain px-3 py-1 rounded text-sm hover:bg-[var(--btn-plain-bg-hover)]">植物</a>
-      <a href="/blog/travel" class="btn-plain px-3 py-1 rounded text-sm hover:bg-[var(--btn-plain-bg-hover)]">旅行・グルメ</a>
-    </div>
-  </div>
-
-  <div class="space-y-6">
+  <div class="blog-list">
     {currentEntries.map(entry => (
-      <article class="card border-l-4 border-[var(--primary)]">
-        <h2 class="text-xl font-semibold mb-3">
-          <a href={`/blog/${entry.slug}`} class="link-underline text-90 hover:text-[var(--primary)]">
-            {entry.data.title}
-          </a>
+      <article class="blog-item">
+        <h2>
+          <a href={`/blog/${entry.slug}`}>{entry.data.title}</a>
         </h2>
-        <div class="flex flex-wrap items-center gap-4 text-75 mb-4">
+        <div class="meta">
           <span class="category">{categoryNames[entry.data.category]}</span>
-          <span class="text-50">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+          <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
         </div>
-        <div class="text-75 leading-relaxed mb-4">
+        <div class="excerpt">
           {entry.body.slice(0, 500)}...
         </div>
         {entry.data.tags.length > 0 && (
-          <div class="flex flex-wrap gap-2">
+          <div class="tags">
             {entry.data.tags.map(tag => (
-              <span class="bg-[var(--btn-regular-bg)] text-[var(--btn-content)] px-2 py-1 rounded text-sm">
-                {tag}
-              </span>
+              <span class="tag">{tag}</span>
             ))}
           </div>
         )}
@@ -90,4 +84,80 @@ const categoryNames = {
       )}
     </div>
   )}
+
+  <style>
+    .categories {
+      margin: 2rem 0;
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+    }
+    .categories h3 {
+      margin: 0 0 1rem 0;
+      color: #2c3e50;
+    }
+    .categories ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .categories a {
+      color: #3498db;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid #3498db;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    .categories a:hover {
+      background-color: #3498db;
+      color: white;
+    }
+    .blog-list {
+      margin: 2rem 0;
+    }
+    .blog-item {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    }
+    .blog-item h2 {
+      margin: 0 0 1rem 0;
+    }
+    .blog-item h2 a {
+      color: #2c3e50;
+      text-decoration: none;
+    }
+    .blog-item h2 a:hover {
+      color: #3498db;
+    }
+    .meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+    .excerpt {
+      margin: 1rem 0;
+      line-height: 1.6;
+      color: #555;
+    }
+    .tags {
+      margin-top: 1rem;
+    }
+    .tag {
+      display: inline-block;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-right: 0.5rem;
+    }
+  </style>
 </Layout>
