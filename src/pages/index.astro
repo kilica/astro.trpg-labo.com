@@ -14,6 +14,27 @@ const allEntries = [
   ...reviewEntries.map(entry => ({ ...entry, type: 'review' }))
 ].sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()).slice(0, 10);
 
+// Category mappings
+const categoryNames = {
+  labo: {
+    general: '全般',
+    scenariomaking: 'シナリオ作成',
+    system: 'システム'
+  },
+  blog: {
+    general: '一般',
+    game: 'ゲーム',
+    dev: '開発',
+    home: '家・インテリア',
+    plants: '植物',
+    travel: '旅行・グルメ'
+  },
+  review: {
+    gadget: 'ガジェット',
+    book: '本'
+  }
+};
+
 const typeNames = {
   labo: '研究室',
   blog: 'ブログ',
@@ -22,24 +43,20 @@ const typeNames = {
 ---
 
 <Layout title="TRPG研究室 - ホーム">
-  <div class="text-center mb-12">
-    <h1 class="text-4xl font-bold text-90 mb-4">TRPG研究室へようこそ</h1>
-    <p class="text-75 text-lg">テーブルトークRPGに関する研究、ブログ、レビューを発信しています。</p>
-  </div>
+  <h1>TRPG研究室へようこそ</h1>
+  <p>テーブルトークRPGに関する研究、ブログ、レビューを発信しています。</p>
 
-  <section class="mb-12">
-    <h2 class="text-2xl font-bold text-90 mb-6">最近の更新</h2>
-    <div class="space-y-4">
+  <section>
+    <h2>最近の更新</h2>
+    <div class="recent-updates">
       {allEntries.map(entry => (
-        <div class="card !p-4 border-l-4 border-[var(--primary)]">
-          <div class="flex flex-wrap items-center gap-4 text-75 mb-2">
-            <span class="text-50">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+        <div class="update-item">
+          <div class="meta">
+            <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
             <span class="category">{typeNames[entry.type]}</span>
           </div>
-          <h3 class="text-lg font-semibold">
-            <a href={`/${entry.type}/${entry.slug}`} class="link-underline text-90 hover:text-[var(--primary)]">
-              {entry.data.title}
-            </a>
+          <h3>
+            <a href={`/${entry.type}/${entry.slug}`}>{entry.data.title}</a>
           </h3>
         </div>
       ))}
@@ -48,53 +65,68 @@ const typeNames = {
 
   <div class="grid">
     <section class="card">
-      <h3 class="text-xl font-semibold mb-3 text-90">研究室</h3>
-      <p class="text-75 mb-4">TRPGに関する研究や情報をカテゴリ別にまとめています。</p>
-      <h4 class="text-lg font-medium mb-2 text-90">カテゴリ</h4>
-      <ul class="list-disc list-inside text-75 space-y-1 mb-4">
-        <li>全般</li>
-        <li>シナリオ作成</li>
-        <li>システム</li>
+      <h3>研究室</h3>
+      <p>TRPGに関する研究や情報をカテゴリ別にまとめています。</p>
+      <h4>カテゴリ</h4>
+      <ul>
+        <li><a href="/labo">全般</a></li>
+        <li><a href="/labo">シナリオ作成</a></li>
+        <li><a href="/labo">システム</a></li>
       </ul>
-      <p>
-        <a href="/labo" class="btn-regular px-4 py-2 rounded-lg inline-flex items-center gap-2">
-          研究室一覧を見る →
-        </a>
-      </p>
+      <p><a href="/labo">研究室一覧を見る →</a></p>
     </section>
 
     <section class="card">
-      <h3 class="text-xl font-semibold mb-3 text-90">ブログ</h3>
-      <p class="text-75 mb-4">TRPGや日常に関する記事を投稿しています。</p>
-      <h4 class="text-lg font-medium mb-2 text-90">カテゴリ</h4>
-      <ul class="list-disc list-inside text-75 space-y-1 mb-4">
-        <li><a href="/blog/general" class="link-underline hover:text-[var(--primary)]">一般</a></li>
-        <li><a href="/blog/game" class="link-underline hover:text-[var(--primary)]">ゲーム</a></li>
-        <li><a href="/blog/dev" class="link-underline hover:text-[var(--primary)]">開発</a></li>
-        <li><a href="/blog/home" class="link-underline hover:text-[var(--primary)]">家・インテリア</a></li>
-        <li><a href="/blog/plants" class="link-underline hover:text-[var(--primary)]">植物</a></li>
-        <li><a href="/blog/travel" class="link-underline hover:text-[var(--primary)]">旅行・グルメ</a></li>
+      <h3>ブログ</h3>
+      <p>TRPGや日常に関する記事を投稿しています。</p>
+      <h4>カテゴリ</h4>
+      <ul>
+        <li><a href="/blog/general">一般</a></li>
+        <li><a href="/blog/game">ゲーム</a></li>
+        <li><a href="/blog/dev">開発</a></li>
+        <li><a href="/blog/home">家・インテリア</a></li>
+        <li><a href="/blog/plants">植物</a></li>
+        <li><a href="/blog/travel">旅行・グルメ</a></li>
       </ul>
-      <p>
-        <a href="/blog" class="btn-regular px-4 py-2 rounded-lg inline-flex items-center gap-2">
-          ブログ一覧を見る →
-        </a>
-      </p>
+      <p><a href="/blog">ブログ一覧を見る →</a></p>
     </section>
 
     <section class="card">
-      <h3 class="text-xl font-semibold mb-3 text-90">レビュー</h3>
-      <p class="text-75 mb-4">ガジェットや本のレビューを5段階評価で紹介しています。</p>
-      <h4 class="text-lg font-medium mb-2 text-90">カテゴリ</h4>
-      <ul class="list-disc list-inside text-75 space-y-1 mb-4">
-        <li><a href="/review/gadget" class="link-underline hover:text-[var(--primary)]">ガジェット</a></li>
-        <li><a href="/review/book" class="link-underline hover:text-[var(--primary)]">本</a></li>
+      <h3>レビュー</h3>
+      <p>ガジェットや本のレビューを5段階評価で紹介しています。</p>
+      <h4>カテゴリ</h4>
+      <ul>
+        <li><a href="/review/gadget">ガジェット</a></li>
+        <li><a href="/review/book">本</a></li>
       </ul>
-      <p>
-        <a href="/review" class="btn-regular px-4 py-2 rounded-lg inline-flex items-center gap-2">
-          レビュー一覧を見る →
-        </a>
-      </p>
+      <p><a href="/review">レビュー一覧を見る →</a></p>
     </section>
   </div>
+
+  <style>
+    .recent-updates {
+      margin: 1rem 0;
+    }
+    .update-item {
+      border-bottom: 1px solid #eee;
+      padding: 1rem 0;
+    }
+    .update-item:last-child {
+      border-bottom: none;
+    }
+    .update-item h3 {
+      margin: 0.5rem 0;
+    }
+    .update-item h3 a {
+      color: #2c3e50;
+      text-decoration: none;
+    }
+    .update-item h3 a:hover {
+      color: #3498db;
+    }
+    .date {
+      color: #666;
+      margin-right: 1rem;
+    }
+  </style>
 </Layout>
