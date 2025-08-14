@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const categories = ['general', 'game', 'dev', 'home', 'plants', 'travel'];
+  const categories = ['general', 'game', 'dev', 'home', 'plants', 'travel', 'science'];
   return categories.map(category => ({
     params: { category_slug: category }
   }));
@@ -36,7 +36,8 @@ const categoryNames = {
   dev: '開発',
   home: '家・インテリア',
   plants: '植物',
-  travel: '旅行・グルメ'
+  travel: '旅行・グルメ',
+  science: '科学・技術'
 };
 
 const currentCategoryName = categoryNames[category_slug];
@@ -107,6 +108,7 @@ const currentCategoryName = categoryNames[category_slug];
           <li><a href="/blog/home" class={category_slug === 'home' ? 'active' : ''}>家・インテリア</a></li>
           <li><a href="/blog/plants" class={category_slug === 'plants' ? 'active' : ''}>植物</a></li>
           <li><a href="/blog/travel" class={category_slug === 'travel' ? 'active' : ''}>旅行・グルメ</a></li>
+          <li><a href="/blog/science" class={category_slug === 'science' ? 'active' : ''}>科学・技術</a></li>
         </ul>
       </div>
 
