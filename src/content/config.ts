@@ -29,6 +29,7 @@ const reviewCollection = defineCollection({
     rating: z.number().min(1).max(5),
     officialUrl: z.string().url().optional(),
     amazonUrl: z.string().url().optional(),
+    isbn: z.string().optional(),
     recommendFor: z.string().optional(),
     notRecommendFor: z.string().optional(),
     goodPoints: z.string().optional(),
