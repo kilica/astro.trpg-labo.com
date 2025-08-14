@@ -15,7 +15,7 @@ const blogCollection = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    category: z.enum(['general', 'game', 'dev', 'home', 'plants', 'travel']),
+    category: z.enum(['general', 'game', 'dev', 'home', 'plants', 'travel', 'science']),
     tags: z.array(z.string()).default([]),
     publishedAt: z.date(),
   }),
