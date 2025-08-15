@@ -47,6 +47,12 @@ const processedBadPoints = entry.data.badPoints ? marked(entry.data.badPoints) :
         <span class="date">公開日: {entry.data.publishedAt.toISOString().split('T')[0]}</span>
       </div>
       
+      {entry.data.isbn && (
+        <div class="isbn">
+          <strong>ISBN:</strong> {entry.data.isbn}
+        </div>
+      )}
+      
       <div class="links">
         {entry.data.officialUrl && (
           <a href={entry.data.officialUrl} target="_blank" rel="noopener noreferrer" class="official-link">
@@ -148,6 +154,16 @@ const processedBadPoints = entry.data.badPoints ? marked(entry.data.badPoints) :
     .meta .date {
       color: #666;
       font-size: 0.9rem;
+    }
+    .isbn {
+      margin: 1rem 0;
+      padding: 0.5rem;
+      background-color: #f8f9fa;
+      border-left: 3px solid #6c757d;
+      font-size: 0.9rem;
+    }
+    .isbn strong {
+      color: #495057;
     }
     .links {
       margin-top: 1rem;
