@@ -26,7 +26,8 @@ $category_list = [
     2 => 'game',
     3 => 'dev',
     4 => 'travel',
-    5 => 'item',
+    5 => 'home',
+    6 => 'plant'
 ];
 
 foreach ($objects as $obj) {
@@ -45,11 +46,18 @@ foreach ($objects as $obj) {
     foreach ($tagObjects as $tagObj) {
         $tags[] = '"' . $tagObj->getShow('tag') . '"';
         // タグが「お出かけ」の場合は「カテゴリ」に「旅行」をセットする
-        if ($tagObj->getShow('tag') == 'お出かけ' || $tagObj->getShow('tag') == 'お出かけ') {
+        if ($tagObj->getShow('tag') == 'お出かけ' || $tagObj->getShow('tag') == '自転車') {
             $category = 'travel';
         }
         if ($tagObj->getShow('tag') == 'ガジェット' || $tagObj->getShow('tag') == '作品') {
-            $category = 'item';
+            $category = 'home';
+        }
+        if (
+            $tagObj->getShow('tag') == '科学技術' 
+            || $tagObj->getShow('tag') == '歴史'
+            || $tagObj->getShow('tag') == 'ドキュメンタリ'
+            ) {
+            $category = 'science';
         }
     }
 
