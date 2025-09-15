@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { marked } from 'marked';
+import '../../styles/review.css';
 
 export async function getStaticPaths() {
   const reviewEntries = await getCollection('review');
@@ -98,161 +99,14 @@ const processedBadPoints = entry.data.badPoints ? marked(entry.data.badPoints) :
     </div>
 
     <div class="content">
-      <h3>詳細レビュー</h3>
-      <Content />
+      <h2>レビュー</h2>
+      <div class="review-body">
+        <Content />
+      </div>
     </div>
   </article>
 
   <nav class="back-link">
     <a href="/review">← レビュー一覧に戻る</a>
   </nav>
-
-  <style>
-    .breadcrumb {
-      margin-bottom: 1rem;
-      color: #666;
-      font-size: 0.9rem;
-    }
-    .breadcrumb a {
-      color: #3498db;
-      text-decoration: none;
-    }
-    .breadcrumb a:hover {
-      text-decoration: underline;
-    }
-    .breadcrumb .current {
-      font-weight: bold;
-    }
-    article header {
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #eee;
-    }
-    article h1 {
-      margin: 0 0 1rem 0;
-      color: #2c3e50;
-    }
-    .meta {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
-    .meta .category {
-      background-color: #e74c3c;
-      color: white;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-    }
-    .meta .rating {
-      color: #f39c12;
-      font-weight: bold;
-      font-size: 1.1rem;
-    }
-    .meta .date {
-      color: #666;
-      font-size: 0.9rem;
-    }
-    .isbn {
-      margin: 1rem 0;
-      padding: 0.5rem;
-      background-color: #f8f9fa;
-      border-left: 3px solid #6c757d;
-      font-size: 0.9rem;
-    }
-    .isbn strong {
-      color: #495057;
-    }
-    .links {
-      margin-top: 1rem;
-    }
-    .links a {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      margin-right: 1rem;
-      border-radius: 4px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: all 0.3s;
-    }
-    .official-link {
-      background-color: #3498db;
-      color: white;
-    }
-    .official-link:hover {
-      background-color: #2980b9;
-    }
-    .amazon-link {
-      background-color: #ff9900;
-      color: white;
-    }
-    .amazon-link:hover {
-      background-color: #e68900;
-    }
-    .review-sections {
-      margin: 2rem 0;
-    }
-    .review-sections section {
-      margin: 1.5rem 0;
-      padding: 1.5rem;
-      //border-radius: 8px;
-    }
-    .recommend-section {
-      background-color: #d5f4e6;
-      border-left: 4px solid #27ae60;
-    }
-    .not-recommend-section {
-      background-color: #fadbd8;
-      border-left: 4px solid #e74c3c;
-    }
-    .good-points-section {
-      background-color: #d4edda;
-      border-left: 4px solid #28a745;
-    }
-    .bad-points-section {
-      background-color: #f8d7da;
-      border-left: 4px solid #dc3545;
-    }
-    .review-sections h3 {
-      margin: 0 0 1rem 0;
-      color: #2c3e50;
-      font-size: 1.1rem;
-    }
-    .content {
-      margin: 2rem 0;
-      line-height: 1.8;
-    }
-    .content h3 {
-      color: #2c3e50;
-      margin-bottom: 1rem;
-      border-bottom: 2px solid #3498db;
-      padding-bottom: 0.5rem;
-    }
-    .content h1, .content h2, .content h4, .content h5, .content h6 {
-      color: #2c3e50;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-    }
-    .content p {
-      margin-bottom: 1rem;
-    }
-    .content ul, .content ol {
-      margin-bottom: 1rem;
-      padding-left: 2rem;
-    }
-    .back-link {
-      margin-top: 2rem;
-      padding-top: 1rem;
-      border-top: 1px solid #eee;
-    }
-    .back-link a {
-      color: #3498db;
-      text-decoration: none;
-    }
-    .back-link a:hover {
-      text-decoration: underline;
-    }
-  </style>
 </Layout>

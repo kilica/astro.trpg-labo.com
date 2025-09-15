@@ -1,0 +1,105 @@
+.category-group {
+  margin-bottom: 1.5rem;
+}
+
+.category-group:last-child {
+  margin-bottom: 0;
+}
+
+.category-title {
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.hierarchy {
+}
+
+.entry-link {
+  color: #2c3e50;
+  text-decoration: none;
+  font-weight: 400;
+  display: block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.entry-link:hover {
+  background-color: #e9ecef;
+  color: #3498db;
+}
+
+.category-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+.category-section h2 {
+  color: #2c3e50;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+.entry-item {
+  margin-bottom: 0.75rem;
+  padding: 0.1rem;
+  font-size: 0.9rem;
+}
+
+.entry-item h3 {
+  margin: 0 0 0.5rem 0;
+}
+.entry-item h3 a {
+  color: #2c3e50;
+  text-decoration: none;
+}
+.entry-item h3 a:hover {
+  color: #3498db;
+}
+
+.children {
+  margin-top: 0.25rem;
+  margin-left: 0.25rem;
+  padding-left: 0.25rem;
+  border-left: 2px solid #dee2e6;
+}
+.child-item {
+  margin: 0.25rem 0;
+  padding: 0.25rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+.child-item h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+}
+.child-item h4 a {
+  color: #34495e;
+  text-decoration: none;
+}
+.child-item h4 a:hover {
+  color: #3498db;
+}
+.child-link {
+  color: #37393c;
+  text-decoration: none;
+  display: block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+.child-link:hover {
+  background-color: #e9ecef;
+  color: #3498db;
+}
+
+/* Main Content Styles */
+.main-content {
+  min-width: 0;
+}
+

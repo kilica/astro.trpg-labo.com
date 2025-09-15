@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import '../../styles/labo.css';
 
 const laboEntries = await getCollection('labo');
 
@@ -90,62 +91,4 @@ function buildHierarchy(entries) {
       </section>
     )
   ))}
-
-  <style>
-    .category-section {
-      margin: 2rem 0;
-      padding: 1.5rem;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-    }
-    .category-section h2 {
-      color: #2c3e50;
-      border-bottom: 2px solid #3498db;
-      padding-bottom: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .entry-item {
-      margin: 1rem 0;
-      padding: 1rem;
-      background-color: white;
-      //border-radius: 6px;
-      border-left: 4px solid #3498db;
-    }
-    .entry-item h3 {
-      margin: 0 0 0.5rem 0;
-    }
-    .entry-item h3 a {
-      color: #2c3e50;
-      text-decoration: none;
-    }
-    .entry-item h3 a:hover {
-      color: #3498db;
-    }
-    .children {
-      margin-top: 1rem;
-      padding-left: 2rem;
-      border-left: 2px solid #ecf0f1;
-    }
-    .child-item {
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      background-color: #f8f9fa;
-      border-radius: 4px;
-    }
-    .child-item h4 {
-      margin: 0 0 0.25rem 0;
-      font-size: 1rem;
-    }
-    .child-item h4 a {
-      color: #34495e;
-      text-decoration: none;
-    }
-    .child-item h4 a:hover {
-      color: #3498db;
-    }
-    .meta {
-      color: #666;
-      font-size: 0.9rem;
-    }
-  </style>
 </Layout>

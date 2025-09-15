@@ -1,0 +1,135 @@
+    .breadcrumb {
+      margin-bottom: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .breadcrumb a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .breadcrumb .current {
+      font-weight: bold;
+    }
+    .review-list {
+      margin: 2rem 0;
+    }
+
+    .review-item {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      border-left: 4px solid #3498db;
+    }
+    .review-item h2 {
+      margin: 0 0 1rem 0;
+    }
+    .review-item h2 a {
+      color: #2c3e50;
+      text-decoration: none;
+    }
+    .review-item h2 a:hover {
+      color: #e74c3c;
+    }
+
+    .isbn {
+      margin: 1rem 0;
+      padding: 0.5rem;
+      background-color: #f8f9fa;
+      border-left: 3px solid #6c757d;
+      font-size: 0.9rem;
+    }
+    .isbn strong {
+      color: #495057;
+    }
+    .links {
+      margin-top: 1rem;
+    }
+    .links a {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      margin-right: 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .official-link {
+      background-color: #3498db;
+      color: white;
+    }
+    .official-link:hover {
+      background-color: #2980b9;
+    }
+    .amazon-link {
+      background-color: #ff9900;
+      color: white;
+    }
+    .amazon-link:hover {
+      background-color: #e68900;
+    }
+
+    .review-sections {
+      margin: 2rem 0;
+    }
+    .review-sections section {
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+    }
+    .recommend-section, .not-recommend-section {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+    }
+    .recommend-section h4, .not-recommend-section h4 {
+      margin: 0 0 0.5rem 0;
+    }
+    .recommend-section p, .not-recommend-section p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    .no-reviews {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+    .recommend-section {
+      background-color: #d5f4e6;
+      border-left: 4px solid #27ae60;
+    }
+    .not-recommend-section {
+      background-color: #fadbd8;
+      border-left: 4px solid #e74c3c;
+    }
+    .good-points-section {
+      background-color: #d4edda;
+      border-left: 4px solid #28a745;
+    }
+    .bad-points-section {
+      background-color: #f8d7da;
+      border-left: 4px solid #dc3545;
+    }
+    .review-sections h3 {
+      margin: 0 0 1rem 0;
+      color: #2c3e50;
+      font-size: 1.1rem;
+    }
+    .content {
+      margin: 2rem 0;
+      line-height: 1.8;
+    }
+    .review-title h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 0.5rem;
+    }
+    .review-body h2 {
+      font-size: 1.4em;
+    }
+
+    .categories a:hover, .categories a.active {
+      background-color: #3498db;
+      color: white;
+    }

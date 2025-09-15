@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { marked } from 'marked';
+import '../../styles/review.css';
 
 export async function getStaticPaths() {
   const categories = ['gadget', 'book'];
@@ -109,110 +110,4 @@ function renderStars(rating) {
       )}
     </div>
   )}
-
-  <style>
-    .breadcrumb {
-      margin-bottom: 1rem;
-      color: #666;
-      font-size: 0.9rem;
-    }
-    .breadcrumb a {
-      color: #3498db;
-      text-decoration: none;
-    }
-    .breadcrumb a:hover {
-      text-decoration: underline;
-    }
-    .breadcrumb .current {
-      font-weight: bold;
-    }
-    .categories {
-      margin: 2rem 0;
-      padding: 1rem;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-    }
-    .categories h3 {
-      margin: 0 0 1rem 0;
-      color: #2c3e50;
-    }
-    .categories ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .categories a {
-      color: #3498db;
-      text-decoration: none;
-      padding: 0.5rem 1rem;
-      border: 1px solid #3498db;
-      border-radius: 4px;
-      transition: all 0.3s;
-    }
-    .categories a:hover, .categories a.active {
-      background-color: #3498db;
-      color: white;
-    }
-    .review-list {
-      margin: 2rem 0;
-    }
-    .review-item {
-      margin: 2rem 0;
-      padding: 1.5rem;
-      background-color: #f8f9fa;
-      //border-radius: 8px;
-      border-left: 4px solid #e74c3c;
-    }
-    .review-item h2 {
-      margin: 0 0 1rem 0;
-    }
-    .review-item h2 a {
-      color: #2c3e50;
-      text-decoration: none;
-    }
-    .review-item h2 a:hover {
-      color: #e74c3c;
-    }
-    .meta {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .meta .rating {
-      color: #f39c12;
-      font-weight: bold;
-    }
-    .recommend-section, .not-recommend-section {
-      margin: 1rem 0;
-      padding: 1rem;
-      //border-radius: 6px;
-    }
-    .recommend-section {
-      background-color: #d5f4e6;
-      border-left: 4px solid #27ae60;
-    }
-    .not-recommend-section {
-      background-color: #fadbd8;
-      border-left: 4px solid #e74c3c;
-    }
-    .recommend-section h4, .not-recommend-section h4 {
-      margin: 0 0 0.5rem 0;
-      font-size: 0.9rem;
-      font-weight: bold;
-    }
-    .recommend-section p, .not-recommend-section p {
-      margin: 0;
-      font-size: 0.9rem;
-    }
-    .no-reviews {
-      text-align: center;
-      padding: 2rem;
-      color: #666;
-    }
-  </style>
 </Layout>
