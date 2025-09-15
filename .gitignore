@@ -25,3 +25,9 @@ pnpm-debug.log*
 
 # vscode setting folder
 .vscode/
+public/images/amazon
+public/images/blog
+public/images/elfinder
+public/images/map
+public/images/misc
+public/images/rpg
