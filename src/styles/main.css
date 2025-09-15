@@ -64,6 +64,12 @@ main {
     gap: 2rem;
     margin: 2rem 0;
 }
+img {
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  display: block; /* インライン要素の余白を除去 */
+}
 .card {
     background-color: #f8f9fa;
     padding: 1.5rem;
