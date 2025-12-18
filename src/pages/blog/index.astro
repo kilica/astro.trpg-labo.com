@@ -2,22 +2,21 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import '../../styles/blog.css';
+import { getPaginationItems } from '../../utils/pagination';
 
-const url = new URL(Astro.request.url);
-const currentPage = parseInt(url.searchParams.get('page') || '1');
 const itemsPerPage = 20;
 
 const blogEntries = await getCollection('blog');
 const sortedEntries = blogEntries.sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
 const totalPages = Math.ceil(sortedEntries.length / itemsPerPage);
-const startIndex = (currentPage - 1) * itemsPerPage;
-const endIndex = startIndex + itemsPerPage;
-const currentEntries = sortedEntries.slice(startIndex, endIndex);
+const currentEntries = sortedEntries.slice(0, itemsPerPage);
 
 // Sidebar data
 const recentArticles = sortedEntries.slice(0, 10);
 const years = [...new Set(blogEntries.map(entry => entry.data.publishedAt.getFullYear()))].sort((a, b) => b - a);
+
+const paginationItems = getPaginationItems({ currentPage: 1, totalPages });
 
 const categoryNames = {
   general: '一般',
@@ -67,7 +66,7 @@ const categoryNames = {
         <ul class="year-list">
           {years.map(year => (
             <li>
-              <a href={`/blog?year=${year}`}>{year}年</a>
+              <a href={`/blog/year/${year}`}>{year}年</a>
             </li>
           ))}
         </ul>
@@ -120,9 +119,13 @@ const categoryNames = {
       {totalPages > 1 && (
         <div class="pagination">
           <span class="current">1</span>
-          {Array.from({ length: totalPages - 1 }, (_, i) => i + 2).map(page => (
-            <a href={`/blog/list/${page}`}>{page}</a>
-          ))}
+          {paginationItems.slice(1).map(item =>
+            item === 'ellipsis' ? (
+              <span class="ellipsis">...</span>
+            ) : (
+              <a href={`/blog/list/${item}`}>{item}</a>
+            )
+          )}
           <a href="/blog/list/2">次のページ →</a>
         </div>
       )}
