@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import '../../../styles/blog.css';
 
 export const prerender = true;
 
@@ -14,68 +15,136 @@ export async function getStaticPaths({ paginate }) {
 }
 
 const { page } = Astro.props;
+
+// Get all entries for sidebar data
+const blogEntries = await getCollection('blog');
+const sortedEntries = blogEntries.sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+const recentArticles = sortedEntries.slice(0, 10);
+const years = [...new Set(blogEntries.map(entry => entry.data.publishedAt.getFullYear()))].sort((a, b) => b - a);
+
 const categoryNames = {
   general: '一般',
   game: 'ゲーム',
   dev: '開発',
   home: '家・インテリア',
   plants: '植物',
-  travel: '旅行・グルメ'
+  travel: '旅行・グルメ',
+  science: '科学・技術'
 };
 ---
 
-<Layout title={`ブログ - ページ ${page.currentPage}`}>
-  <h1>ブログ</h1>
-  <p>TRPGや日常に関する記事を投稿しています。</p>
+<Layout title={`ブログ - ページ ${page.currentPage} - TRPG研究室`}>
+  <div class="layout-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <!-- Recent Articles -->
+      <section class="sidebar-section">
+        <h3>最近の記事</h3>
+        <ul class="recent-articles">
+          {recentArticles.map(article => (
+            <li>
+              <a href={`/blog/${article.slug}`}>
+                <span class="article-date">{article.data.publishedAt.toISOString().split('T')[0]}</span>
+                <span class="article-title">{article.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-  <div class="categories">
-    <h3>カテゴリで絞り込み</h3>
-    <ul>
-      <li><a href="/blog/list/1">すべて</a></li>
-      <li><a href="/blog/general">一般</a></li>
-      <li><a href="/blog/game">ゲーム</a></li>
-      <li><a href="/blog/dev">開発</a></li>
-      <li><a href="/blog/home">家・インテリア</a></li>
-      <li><a href="/blog/plants">植物</a></li>
-      <li><a href="/blog/travel">旅行・グルメ</a></li>
-    </ul>
-  </div>
+      <!-- Categories -->
+      <section class="sidebar-section">
+        <h3>カテゴリ一覧</h3>
+        <ul class="category-list">
+          {Object.entries(categoryNames).map(([slug, name]) => (
+            <li>
+              <a href={`/blog/${slug}`}>{name}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-  <div class="blog-list">
-    {page.data.map(entry => (
-      <article class="blog-item">
-        <h2>
-          <a href={`/blog/${entry.slug}`}>{entry.data.title}</a>
-        </h2>
-        <div class="meta">
-          <span class="category">{categoryNames[entry.data.category]}</span>
-          <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+      <!-- Year Archive -->
+      <section class="sidebar-section">
+        <h3>年別アーカイブ</h3>
+        <ul class="year-list">
+          {years.map(year => (
+            <li>
+              <a href={`/blog/year/${year}`}>{year}年</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <h1>ブログ</h1>
+      <p>TRPGや日常に関する記事を投稿しています。</p>
+
+      <div class="categories">
+        <h3>カテゴリで絞り込み</h3>
+        <ul>
+          <li><a href="/blog">すべて</a></li>
+          <li><a href="/blog/general">一般</a></li>
+          <li><a href="/blog/game">ゲーム</a></li>
+          <li><a href="/blog/dev">開発</a></li>
+          <li><a href="/blog/home">家・インテリア</a></li>
+          <li><a href="/blog/plants">植物</a></li>
+          <li><a href="/blog/travel">旅行・グルメ</a></li>
+          <li><a href="/blog/science">科学・技術</a></li>
+        </ul>
+      </div>
+
+      <div class="blog-list">
+        {page.data.map(entry => (
+          <article class="blog-item">
+            <h2>
+              <a href={`/blog/${entry.slug}`}>{entry.data.title}</a>
+            </h2>
+            <div class="meta">
+              <span class="category">{categoryNames[entry.data.category]}</span>
+              <span class="date">{entry.data.publishedAt.toISOString().split('T')[0]}</span>
+            </div>
+            <div class="excerpt">
+              {entry.body.slice(0, 500)}...
+            </div>
+            {entry.data.tags?.length > 0 && (
+              <div class="tags">
+                {entry.data.tags.map(tag => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+
+      {page.lastPage > 1 && (
+        <div class="pagination">
+          {page.currentPage > 1 && (
+            page.currentPage === 2 ? (
+              <a href="/blog">← 前のページ</a>
+            ) : (
+              <a href={`/blog/list/${page.currentPage - 1}`}>← 前のページ</a>
+            )
+          )}
+          
+          {Array.from({ length: page.lastPage }, (_, i) => i + 1).map(p =>
+            p === page.currentPage ? (
+              <span class="current">{p}</span>
+            ) : p === 1 ? (
+              <a href="/blog">{p}</a>
+            ) : (
+              <a href={`/blog/list/${p}`}>{p}</a>
+            )
+          )}
+          
+          {page.currentPage < page.lastPage && (
+            <a href={`/blog/list/${page.currentPage + 1}`}>次のページ →</a>
+          )}
         </div>
-        <div class="excerpt">
-          {entry.body.slice(0, 500)}...
-        </div>
-        {entry.data.tags?.length > 0 && (
-          <div class="tags">
-            {entry.data.tags.map(tag => (
-              <span class="tag">{tag}</span>
-            ))}
-          </div>
-        )}
-      </article>
-    ))}
-  </div>
-
-  {page.lastPage > 1 && (
-    <div class="pagination">
-      {page.url.prev && <a href={page.url.prev}>← 前のページ</a>}
-      {Array.from({ length: page.lastPage }, (_, i) => i + 1).map(p =>
-        p === page.currentPage ? (
-          <span class="current">{p}</span>
-        ) : (
-          <a href={`/blog/list/${p}`}>{p}</a>
-        )
       )}
-      {page.url.next && <a href={page.url.next}>次のページ →</a>}
     </div>
-  )}
+  </div>
 </Layout>

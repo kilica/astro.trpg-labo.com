@@ -1,19 +1,32 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import '../../styles/blog.css';
+import '../../../styles/blog.css';
 
 export async function getStaticPaths() {
+  const itemsPerPage = 20;
   const categories = ['general', 'game', 'dev', 'home', 'plants', 'travel', 'science'];
-  return categories.map(category => ({
-    params: { category_slug: category }
-  }));
+  const blogEntries = await getCollection('blog');
+  
+  const paths = [];
+  
+  for (const category of categories) {
+    const filteredEntries = blogEntries.filter(entry => entry.data.category === category);
+    const totalPages = Math.ceil(filteredEntries.length / itemsPerPage);
+    
+    // Generate pages 2 and above (page 1 is handled by [category_slug].astro)
+    for (let page = 2; page <= totalPages; page++) {
+      paths.push({
+        params: { category_slug: category, page: String(page) }
+      });
+    }
+  }
+  
+  return paths;
 }
 
-const { category_slug } = Astro.params;
-
-const url = new URL(Astro.request.url);
-const currentPage = parseInt(url.searchParams.get('page') || '1');
+const { category_slug, page } = Astro.params;
+const currentPage = parseInt(page);
 const itemsPerPage = 20;
 
 const blogEntries = await getCollection('blog');
@@ -44,7 +57,7 @@ const categoryNames = {
 const currentCategoryName = categoryNames[category_slug];
 ---
 
-<Layout title={`${currentCategoryName} - ブログ - TRPG研究室`}>
+<Layout title={`${currentCategoryName} - ブログ - ページ ${currentPage} - TRPG研究室`}>
   <nav class="breadcrumb">
     <a href="/">ホーム</a> &gt; 
     <a href="/blog">ブログ</a> &gt; 
@@ -87,7 +100,7 @@ const currentCategoryName = categoryNames[category_slug];
         <ul class="year-list">
           {years.map(year => (
             <li>
-              <a href={`/blog?year=${year}`}>{year}年</a>
+              <a href={`/blog/year/${year}`}>{year}年</a>
             </li>
           ))}
         </ul>
@@ -145,11 +158,27 @@ const currentCategoryName = categoryNames[category_slug];
 
       {totalPages > 1 && (
         <div class="pagination">
-          <span class="current">1</span>
-          {Array.from({ length: totalPages - 1 }, (_, i) => i + 2).map(page => (
-            <a href={`/blog/${category_slug}/${page}`}>{page}</a>
-          ))}
-          <a href={`/blog/${category_slug}/2`}>次のページ →</a>
+          {currentPage > 1 && (
+            currentPage === 2 ? (
+              <a href={`/blog/${category_slug}`}>← 前のページ</a>
+            ) : (
+              <a href={`/blog/${category_slug}/${currentPage - 1}`}>← 前のページ</a>
+            )
+          )}
+          
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p =>
+            p === currentPage ? (
+              <span class="current">{p}</span>
+            ) : p === 1 ? (
+              <a href={`/blog/${category_slug}`}>{p}</a>
+            ) : (
+              <a href={`/blog/${category_slug}/${p}`}>{p}</a>
+            )
+          )}
+          
+          {currentPage < totalPages && (
+            <a href={`/blog/${category_slug}/${currentPage + 1}`}>次のページ →</a>
+          )}
         </div>
       )}
     </div>
