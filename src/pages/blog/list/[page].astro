@@ -2,6 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import '../../../styles/blog.css';
+import { getPaginationItems } from '../../../utils/pagination';
 
 export const prerender = true;
 
@@ -21,6 +22,8 @@ const blogEntries = await getCollection('blog');
 const sortedEntries = blogEntries.sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 const recentArticles = sortedEntries.slice(0, 10);
 const years = [...new Set(blogEntries.map(entry => entry.data.publishedAt.getFullYear()))].sort((a, b) => b - a);
+
+const paginationItems = getPaginationItems({ currentPage: page.currentPage, totalPages: page.lastPage });
 
 const categoryNames = {
   general: '一般',
@@ -130,13 +133,15 @@ const categoryNames = {
             )
           )}
           
-          {Array.from({ length: page.lastPage }, (_, i) => i + 1).map(p =>
-            p === page.currentPage ? (
-              <span class="current">{p}</span>
-            ) : p === 1 ? (
-              <a href="/blog">{p}</a>
+          {paginationItems.map(item =>
+            item === 'ellipsis' ? (
+              <span class="ellipsis">...</span>
+            ) : item === page.currentPage ? (
+              <span class="current">{item}</span>
+            ) : item === 1 ? (
+              <a href="/blog">{item}</a>
             ) : (
-              <a href={`/blog/list/${p}`}>{p}</a>
+              <a href={`/blog/list/${item}`}>{item}</a>
             )
           )}
           

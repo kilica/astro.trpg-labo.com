@@ -1,22 +1,26 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import '../../styles/blog.css';
-import { getPaginationItems } from '../../utils/pagination';
+import '../../../styles/blog.css';
+import { getPaginationItems } from '../../../utils/pagination';
+
+const itemsPerPage = 20;
 
 export async function getStaticPaths() {
-  const categories = ['general', 'game', 'dev', 'home', 'plants', 'travel', 'science'];
-  return categories.map(category => ({
-    params: { category_slug: category }
+  const blogEntries = await getCollection('blog');
+  const years = [...new Set(blogEntries.map(entry => entry.data.publishedAt.getFullYear()))];
+  
+  return years.map(year => ({
+    params: { year: String(year) }
   }));
 }
 
-const { category_slug } = Astro.params;
-const itemsPerPage = 20;
+const { year } = Astro.params;
+const currentYear = parseInt(year);
 
 const blogEntries = await getCollection('blog');
 const filteredEntries = blogEntries
-  .filter(entry => entry.data.category === category_slug)
+  .filter(entry => entry.data.publishedAt.getFullYear() === currentYear)
   .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
 const totalPages = Math.ceil(filteredEntries.length / itemsPerPage);
@@ -26,8 +30,6 @@ const currentEntries = filteredEntries.slice(0, itemsPerPage);
 const sortedEntries = blogEntries.sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 const recentArticles = sortedEntries.slice(0, 10);
 const years = [...new Set(blogEntries.map(entry => entry.data.publishedAt.getFullYear()))].sort((a, b) => b - a);
-
-const paginationItems = getPaginationItems({ currentPage: 1, totalPages });
 
 const categoryNames = {
   general: '一般',
@@ -39,14 +41,14 @@ const categoryNames = {
   science: '科学・技術'
 };
 
-const currentCategoryName = categoryNames[category_slug];
+const paginationItems = getPaginationItems({ currentPage: 1, totalPages });
 ---
 
-<Layout title={`${currentCategoryName} - ブログ - TRPG研究室`}>
+<Layout title={`${currentYear}年の記事 - ブログ - TRPG研究室`}>
   <nav class="breadcrumb">
     <a href="/">ホーム</a> &gt; 
     <a href="/blog">ブログ</a> &gt; 
-    <span class="current">{currentCategoryName}</span>
+    <span class="current">{currentYear}年</span>
   </nav>
 
   <div class="layout-container">
@@ -73,7 +75,7 @@ const currentCategoryName = categoryNames[category_slug];
         <ul class="category-list">
           {Object.entries(categoryNames).map(([slug, name]) => (
             <li>
-              <a href={`/blog/${slug}`} class={category_slug === slug ? 'active' : ''}>{name}</a>
+              <a href={`/blog/${slug}`}>{name}</a>
             </li>
           ))}
         </ul>
@@ -83,9 +85,9 @@ const currentCategoryName = categoryNames[category_slug];
       <section class="sidebar-section">
         <h3>年別アーカイブ</h3>
         <ul class="year-list">
-          {years.map(year => (
+          {years.map(y => (
             <li>
-              <a href={`/blog/year/${year}`}>{year}年</a>
+              <a href={`/blog/year/${y}`} class={y === currentYear ? 'active' : ''}>{y}年</a>
             </li>
           ))}
         </ul>
@@ -94,20 +96,20 @@ const currentCategoryName = categoryNames[category_slug];
 
     <!-- Main Content -->
     <div class="main-content">
-      <h1>ブログ - {currentCategoryName}</h1>
-      <p>{currentCategoryName}カテゴリの記事一覧です。</p>
+      <h1>ブログ - {currentYear}年</h1>
+      <p>{currentYear}年の記事一覧です。</p>
 
       <div class="categories">
         <h3>カテゴリで絞り込み</h3>
         <ul>
           <li><a href="/blog">すべて</a></li>
-          <li><a href="/blog/general" class={category_slug === 'general' ? 'active' : ''}>一般</a></li>
-          <li><a href="/blog/game" class={category_slug === 'game' ? 'active' : ''}>ゲーム</a></li>
-          <li><a href="/blog/dev" class={category_slug === 'dev' ? 'active' : ''}>開発</a></li>
-          <li><a href="/blog/home" class={category_slug === 'home' ? 'active' : ''}>家・インテリア</a></li>
-          <li><a href="/blog/plants" class={category_slug === 'plants' ? 'active' : ''}>植物</a></li>
-          <li><a href="/blog/travel" class={category_slug === 'travel' ? 'active' : ''}>旅行・グルメ</a></li>
-          <li><a href="/blog/science" class={category_slug === 'science' ? 'active' : ''}>科学・技術</a></li>
+          <li><a href="/blog/general">一般</a></li>
+          <li><a href="/blog/game">ゲーム</a></li>
+          <li><a href="/blog/dev">開発</a></li>
+          <li><a href="/blog/home">家・インテリア</a></li>
+          <li><a href="/blog/plants">植物</a></li>
+          <li><a href="/blog/travel">旅行・グルメ</a></li>
+          <li><a href="/blog/science">科学・技術</a></li>
         </ul>
       </div>
 
@@ -137,7 +139,7 @@ const currentCategoryName = categoryNames[category_slug];
 
       {currentEntries.length === 0 && (
         <div class="no-posts">
-          <p>このカテゴリにはまだ記事がありません。</p>
+          <p>この年にはまだ記事がありません。</p>
         </div>
       )}
 
@@ -148,10 +150,10 @@ const currentCategoryName = categoryNames[category_slug];
             item === 'ellipsis' ? (
               <span class="ellipsis">...</span>
             ) : (
-              <a href={`/blog/${category_slug}/${item}`}>{item}</a>
+              <a href={`/blog/year/${year}/${item}`}>{item}</a>
             )
           )}
-          <a href={`/blog/${category_slug}/2`}>次のページ →</a>
+          <a href={`/blog/year/${year}/2`}>次のページ →</a>
         </div>
       )}
     </div>
