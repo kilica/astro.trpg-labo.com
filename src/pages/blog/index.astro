@@ -119,23 +119,13 @@ const categoryNames = {
 
       {totalPages > 1 && (
         <div class="pagination">
-          {currentPage > 1 && (
-            <a href={`/blog?page=${currentPage - 1}`}>← 前のページ</a>
-          )}
-          
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            page === currentPage ? (
-              <span class="current">{page}</span>
-            ) : (
-              <a href={`/blog?page=${page}`}>{page}</a>
-            )
+          <span class="current">1</span>
+          {Array.from({ length: totalPages - 1 }, (_, i) => i + 2).map(page => (
+            <a href={`/blog/list/${page}`}>{page}</a>
           ))}
-          
-          {currentPage < totalPages && (
-            <a href={`/blog?page=${currentPage + 1}`}>次のページ →</a>
-          )}
+          <a href="/blog/list/2">次のページ →</a>
         </div>
       )}
     </div>
-  </div></Layout>
+  </div>
 </Layout>
